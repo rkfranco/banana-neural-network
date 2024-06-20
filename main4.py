@@ -39,7 +39,7 @@ if __name__ == '__main__':
     nn.add(keras.layers.Dropout(rate=0.1))
     nn.add(keras.layers.Dense(100, activation="relu"))
     nn.add(keras.layers.Dropout(rate=0.1))
-    nn.add(keras.layers.Dense(2, activation="softmax")) #sigmoid
+    nn.add(keras.layers.Dense(2, activation="sigmoid")) #sigmoid
     print(nn.summary())
 
 

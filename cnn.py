@@ -33,21 +33,30 @@ def load_dataset():
 if __name__ == '__main__':
     x_train, y_train, x_test, y_test = load_dataset()
 
-    nn = keras.models.Sequential()
-    nn.add(keras.layers.Flatten(input_shape=[224, 224]))
-    nn.add(keras.layers.Dense(300, activation="relu"))
-    nn.add(keras.layers.Dropout(rate=0.1))
-    nn.add(keras.layers.Dense(100, activation="relu"))
-    nn.add(keras.layers.Dropout(rate=0.1))
-    nn.add(keras.layers.Dense(2, activation="sigmoid")) #sigmoid
-    print(nn.summary())
+    nn = keras.models.Sequential([
+        keras.layers.InputLayer(input_shape=(224, 224, 1)),
+        keras.layers.Conv2D(64, 5, activation='relu', padding='same', kernel_initializer='glorot_uniform'),
+        keras.layers.MaxPool2D(2),
+        keras.layers.Conv2D(128, 3, activation='relu', padding='same'),
+        keras.layers.Conv2D(128, 3, activation='relu', padding='same'),
+        keras.layers.MaxPool2D(2),
+        keras.layers.Conv2D(258, 3, activation='relu', padding='same'),
+        keras.layers.Conv2D(258, 3, activation='relu', padding='same'),
+        keras.layers.MaxPool2D(2),
+        keras.layers.Flatten(),
+        keras.layers.Dense(128, activation="relu"),
+        keras.layers.Dropout(rate=0.5),
+        keras.layers.Dense(64, activation="relu"),
+        keras.layers.Dropout(rate=0.5),
+        keras.layers.Dense(2, activation="softmax")])
 
+    X_train_new = x_train.reshape(x_train.shape[0], x_train.shape[1], x_train.shape[2], 1)
+    X_test_new = x_test.reshape(x_test.shape[0], x_test.shape[1], x_test.shape[2], 1)
 
     nn.compile(loss="sparse_categorical_crossentropy",
                optimizer="sgd",
                metrics=["accuracy"])
-    history_nn = nn.fit(x_train, y_train, epochs=20, validation_data=(x_test, y_test))
-
+    history_nn = nn.fit(X_train_new, y_train, epochs=20, validation_data=(X_test_new, y_test))
 
     pd.DataFrame(history_nn.history).plot(figsize=(12, 8))
     plt.grid(True)
@@ -63,3 +72,5 @@ if __name__ == '__main__':
 
     for i in range(len(result)):
         print(f'Previsao: {np.argmax(result[i], axis=-1)} | Verdadeiro: {y_test[350 + i]}')
+
+    nn.evaluate(X_test_new, y_test, verbose=1)

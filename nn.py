@@ -8,7 +8,6 @@ from tensorflow import keras
 
 nomes_classes = ["rotten", "healthy"]
 
-
 def load_data_path(path, class_type, x, y):
     for img_path in os.listdir(path):
         img = cv.imread(f'{path}/{img_path}', cv.IMREAD_GRAYSCALE)
